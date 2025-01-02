@@ -11,8 +11,14 @@ type ButtonProps = {
 };
 
 export function ButtonNumber({ label, onPress, icon }: ButtonProps) {
+  const isIcon = !!icon;
   return (    
-      <TouchableOpacity style={styles.container}  onPress={onPress} >
+      <TouchableOpacity style={[ 
+        styles.container, 
+        isIcon ? styles.iconBackground : styles.labelBackground 
+      ]}  
+      onPress={onPress} 
+    > 
         {icon ?(
           <FontAwesome5 name={icon} size={30} color="#fff" />
           ) : (

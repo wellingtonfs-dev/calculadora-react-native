@@ -17,5 +17,11 @@ export const styles = StyleSheet.create({
     fontSize: 30,
     color: '#fff',
     fontWeight: 'bold',    
-  },  
+  }, 
+  iconBackground: {
+    backgroundColor: "#4CAF50", // Cor do fundo quando houver um ícone.
+  },
+  labelBackground: {
+    backgroundColor: "#2196F3", // Cor do fundo quando houver texto.
+  }, 
 });
