@@ -1,17 +1,23 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import {FontAwesome5} from '@expo/vector-icons';
 
 import { styles } from "./styles";
 
 type ButtonProps = {
-  label: string;  
+  label?: string; 
+  icon?: string; 
   onPress?: () => void;
 };
 
-export function ButtonNumber({ label, onPress }: ButtonProps) {
+export function ButtonNumber({ label, onPress, icon }: ButtonProps) {
   return (    
-      <Pressable style={styles.container}  onPress={onPress} >
-        <Text style={styles.text}>{label}</Text>
-      </Pressable>    
+      <TouchableOpacity style={styles.container}  onPress={onPress} >
+        {icon ?(
+          <FontAwesome5 name={icon} size={30} color="#fff" />
+          ) : (
+          <Text style={styles.text}>{label}</Text>
+        )}        
+      </TouchableOpacity>    
   );
 }

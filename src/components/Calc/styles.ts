@@ -11,5 +11,17 @@ export const styles = StyleSheet.create({
   },
   line:{
     flexDirection: 'row', 
+  },
+  title:{
+    flexDirection: "row",    
+    width: "100%",
+    alignItems: "center",   
+  },
+  text:{
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#fff',
+    margin: 10,    
+    textAlign: 'center',
   }
 });

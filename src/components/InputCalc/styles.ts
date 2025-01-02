@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    fontSize: 40,
+    fontSize: 60,
     fontWeight: 'bold',
     textAlign: 'right',   
     color: '#ffffff',
