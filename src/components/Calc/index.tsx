@@ -3,146 +3,147 @@ import { View, Text } from "react-native";
 import { styles } from "./styles";
 import { InputCalc } from "../InputCalc";
 import { ButtonNumber } from "../ButtonNumber";
-import {FontAwesome5} from '@expo/vector-icons';
+import { FontAwesome5 } from "@expo/vector-icons";
+import { ButtonRow } from "../ButtonRow";
 
-export function Calc() {
-  const [currentNumber, setCurrentNumber] = useState("0");
-  const [firstNumber, setFirstNumber] = useState("0");
-  const [operator, setOperator] = useState("");
+// Definição dos tipos
+type Operator = "+" | "-" | "x" | "/" | "";
 
-  const handleOnClear = () => {
+// Funções utilitárias
+const calculateResult = (
+  firstNumber: string,
+  currentNumber: string,
+  operator: Operator
+): string => {
+  const num1 = Number(firstNumber);
+  const num2 = Number(currentNumber);
+
+  switch (operator) {
+    case "+":
+      return (num1 + num2).toString();
+    case "-":
+      return (num1 - num2).toString();
+    case "x":
+      return (num1 * num2).toString();
+    case "/":
+      return num2 !== 0 ? (num1 / num2).toString() : "Error"; // Evitar divisão por zero
+    default:
+      return currentNumber;
+  }
+};
+
+export function Calc(): JSX.Element {
+  const [currentNumber, setCurrentNumber] = useState<string>("0");
+  const [firstNumber, setFirstNumber] = useState<string>("0");
+  const [operator, setOperator] = useState<Operator>("");
+
+  const resetCalculator = (): void => {
     setCurrentNumber("0");
     setFirstNumber("0");
+    setOperator("");
   };
 
-  const handleAddNumber = (number: string) => {
-    setCurrentNumber((prev) => `${prev === "0" ? "" : prev}${number}`);
+  const addNumber = (number: string): void => {
+    setCurrentNumber((prev) => (prev === "0" ? number : `${prev}${number}`));
   };
 
-  const handleSumNumbers = () => {
+  const setOperation = (operation: Operator): void => {
     if (firstNumber === "0") {
-      setFirstNumber(String(currentNumber));
+      setFirstNumber(currentNumber);
       setCurrentNumber("0");
-      setOperator("+");
+      setOperator(operation);
     } else {
-      const sum = Number(firstNumber) + Number(currentNumber);
-      setCurrentNumber(sum.toString());
+      const result = calculateResult(firstNumber, currentNumber, operator);
+      setFirstNumber(result);
+      setCurrentNumber("0");
+      setOperator(operation);
+    }
+  };
+
+  const calculateEquals = (): void => {
+    if (firstNumber !== "0" && operator && currentNumber !== "0") {
+      const result = calculateResult(firstNumber, currentNumber, operator);
+      setCurrentNumber(result);
+      setFirstNumber("0");
       setOperator("");
     }
   };
 
-  const handleMinusNumbers = () => {
-    if (firstNumber === "0") {
-      setFirstNumber(String(currentNumber));
-      setCurrentNumber("0");
-      setOperator("-");
-    } else {
-      const minus = Number(firstNumber) - Number(currentNumber);
-      setCurrentNumber(minus.toString());
-      setOperator("");
+  const calculatePercent = (): void => {
+    if (currentNumber !== "0" && firstNumber !== "0" && operator) {
+      const num1 = Number(firstNumber);
+      const num2 = Number(currentNumber) / 100; // Converte para fração (ex.: 50 -> 0.5)
+  
+      // Aplica a porcentagem ao número base (firstNumber)
+      const result = num1 * num2;
+  
+      setCurrentNumber(result.toString());
+    } else if (currentNumber !== "0") {
+      // Caso não haja uma operação em andamento, transforma apenas o número atual em porcentagem
+      setCurrentNumber((Number(currentNumber) / 100).toString());
+    }
+  };
+  
+
+  const calculateRoot = (): void => {
+    if (currentNumber !== "0") {
+      setCurrentNumber(Math.sqrt(Number(currentNumber)).toString());
     }
   };
 
-  const handlePercent = () => {
-    if (currentNumber!== "0") {
-      const percent = (Number(currentNumber) / 100) * Number(firstNumber);
-      setCurrentNumber(percent.toString());
-    }
-  }
-
-  const handleRoot = () => {
-    if (currentNumber!== "0") {
-      const root = Math.sqrt(Number(currentNumber));
-      setCurrentNumber(root.toString());
-    }
-  }
-
-  const handleMultiplyNumbers = () => {
-    if (firstNumber === "0") {
-      setFirstNumber(String(currentNumber));
-      setCurrentNumber("0");
-      setOperator("x");
-    } else {
-      const multiply = Number(firstNumber) * Number(currentNumber);
-      setCurrentNumber(multiply.toString());
-      setOperator("");
-    }
-  };
-
-  const handleSplitNumbers = () => {
-    if (firstNumber === "0") {
-      setFirstNumber(String(currentNumber));
-      setCurrentNumber("0");
-      setOperator("/");
-    } else {
-      const split = Number(firstNumber) / Number(currentNumber);
-      setCurrentNumber(split.toString());
-      setOperator("");
-    }
-  };
-
-  const handleDel = () => {
-    setCurrentNumber(currentNumber.slice(0, -1));
-  };
-
-  const handleEquals = () => {
-    if (firstNumber !== "0" && operator !== "" && currentNumber !== "0") {
-      switch (operator) {
-        case "+":
-          handleSumNumbers();
-          break;
-        case "-":
-          handleMinusNumbers();
-          break;
-        case "x":
-          handleMultiplyNumbers();
-          break;
-        case "/":
-          handleSplitNumbers();
-          break;
-        default:
-          break;
-      }
-    }
+  const deleteLastDigit = (): void => {
+    setCurrentNumber((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.title}>
-        <FontAwesome5 name='calculator' size={30} color="#fff" />
+        <FontAwesome5 name="calculator" size={30} color="#fff" />
         <Text style={styles.text}>Calculadora</Text>
       </View>
       <InputCalc number={currentNumber} />
-      <View style={styles.line}>
-        <ButtonNumber label="AC" onPress={handleOnClear} />
-        <ButtonNumber icon="percent" onPress={handlePercent} />
-        <ButtonNumber icon="square-root-alt" onPress={handleRoot} />
-        <ButtonNumber icon="divide" onPress={handleSplitNumbers} />
-      </View>
-      <View style={styles.line}>
-        <ButtonNumber label="7" onPress={() => handleAddNumber("7")} />
-        <ButtonNumber label="8" onPress={() => handleAddNumber("8")} />
-        <ButtonNumber label="9" onPress={() => handleAddNumber("9")} />
-        <ButtonNumber icon="times" onPress={handleMultiplyNumbers} />
-      </View>
-      <View style={styles.line}>
-        <ButtonNumber label="4" onPress={() => handleAddNumber("4")} />
-        <ButtonNumber label="5" onPress={() => handleAddNumber("5")} />
-        <ButtonNumber label="6" onPress={() => handleAddNumber("6")} />
-        <ButtonNumber icon="minus" onPress={handleMinusNumbers} />
-      </View>
-      <View style={styles.line}>
-        <ButtonNumber label="1" onPress={() => handleAddNumber("1")} />
-        <ButtonNumber label="2" onPress={() => handleAddNumber("2")} />
-        <ButtonNumber label="3" onPress={() => handleAddNumber("3")} />
-        <ButtonNumber icon="plus" onPress={handleSumNumbers} />
-      </View>
-      <View style={styles.line}>
-        <ButtonNumber label="," onPress={() => handleAddNumber(".")} />
-        <ButtonNumber label="0" onPress={() => handleAddNumber("0")} />
-        <ButtonNumber icon="backspace" onPress={handleDel} />
-        <ButtonNumber icon="equals" onPress={handleEquals} />
-      </View>
+
+      {/* Linhas de botões */}
+      <ButtonRow
+        buttons={[
+          { label: "AC", onPress: resetCalculator },
+          { icon: "percent", onPress: calculatePercent },
+          { icon: "square-root-alt", onPress: calculateRoot },
+          { icon: "divide", onPress: () => setOperation("/") },
+        ]}
+      />
+      <ButtonRow
+        buttons={[
+          { label: "7", onPress: () => addNumber("7") },
+          { label: "8", onPress: () => addNumber("8") },
+          { label: "9", onPress: () => addNumber("9") },
+          { icon: "times", onPress: () => setOperation("x") },
+        ]}
+      />
+      <ButtonRow
+        buttons={[
+          { label: "4", onPress: () => addNumber("4") },
+          { label: "5", onPress: () => addNumber("5") },
+          { label: "6", onPress: () => addNumber("6") },
+          { icon: "minus", onPress: () => setOperation("-") },
+        ]}
+      />
+      <ButtonRow
+        buttons={[
+          { label: "1", onPress: () => addNumber("1") },
+          { label: "2", onPress: () => addNumber("2") },
+          { label: "3", onPress: () => addNumber("3") },
+          { icon: "plus", onPress: () => setOperation("+") },
+        ]}
+      />
+      <ButtonRow
+        buttons={[
+          { label: ".", onPress: () => addNumber(".") },
+          { label: "0", onPress: () => addNumber("0") },
+          { icon: "backspace", onPress: deleteLastDigit },
+          { icon: "equals", onPress: calculateEquals },
+        ]}
+      />
     </View>
   );
 }
